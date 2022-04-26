@@ -31,7 +31,7 @@ dataSources:
       eventHandlers:
         - event: OrderApprovedPartOne(indexed bytes32,address,indexed address,address,indexed address,uint8,uint8,address,uint256,bytes32)
           handler: handleOrderApprovedPartOne
-        - event: OrderApprovedPartTwo(indexed bytes32,bytes,bytes,address,bytes,address,uint256,uint256,uint256,uint256,uint256,bool)
+        - event: OrderApprovedPartTwo(indexed bytes32,bytes,bytes,address,bytes,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleOrderApprovedPartTwo
         - event: OrderCancelled(indexed bytes32)
           handler: handleOrderCancelled

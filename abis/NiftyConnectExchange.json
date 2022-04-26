@@ -275,8 +275,7 @@
       { "indexed": false, "name": "extra", "type": "uint256" },
       { "indexed": false, "name": "listingTime", "type": "uint256" },
       { "indexed": false, "name": "expirationTime", "type": "uint256" },
-      { "indexed": false, "name": "salt", "type": "uint256" },
-      { "indexed": false, "name": "orderbookInclusionDesired", "type": "bool" }
+      { "indexed": false, "name": "salt", "type": "uint256" }
     ],
     "name": "OrderApprovedPartTwo",
     "type": "event"
