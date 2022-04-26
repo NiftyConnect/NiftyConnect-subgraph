@@ -1,6 +1,28 @@
-type ExampleEntity @entity {
+type NiftyConnectOrder @entity {
+  "orderHash"
   id: ID!
-  count: BigInt!
-  hash: Bytes! # bytes32
-  exchange: Bytes! # address
+
+  orderHash: String!
+  txHash: String!
+  exchange: Bytes!
+  maker: Bytes!
+  taker: Bytes!
+  makerRelayerFeeRecipient: Bytes
+  side: BigInt!
+  saleKind: BigInt!
+  nftAddress: Bytes!
+  tokenId: String
+  ipfsHash: String
+  calldata: Bytes!
+  replacementPattern: Bytes
+  staticTarget: String
+  staticExtradata: String
+  paymentToken: Bytes!
+  orderPrice: BigDecimal!
+  extra: String
+  listingTime: BigInt!
+  expirationTime: BigInt!
+  salt: String!
+  isCancelled: Boolean!
+  isFinalized: Boolean!
 }

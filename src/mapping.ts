@@ -1,39 +1,28 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
-  NiftyConnectExchange,
   OrderApprovedPartOne,
   OrderApprovedPartTwo,
   OrderCancelled,
   OrdersMatched,
-  NonceIncremented,
-  OwnershipRenounced,
-  OwnershipTransferred
-} from "../generated/NiftyConnectExchange/NiftyConnectExchange"
-import { ExampleEntity } from "../generated/schema"
+} from "../generated/NiftyConnectExchange/NiftyConnectExchange";
+import { NiftyConnectOrder } from "../generated/schema";
 
 export function handleOrderApprovedPartOne(event: OrderApprovedPartOne): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+  const params = event.params;
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
+  const entity = new NiftyConnectOrder(params.hash.toHex());
+  entity.txHash = event.transaction.hash.toHex();
+  entity.orderHash = params.hash.toHex();
+  entity.maker = params.maker;
+  entity.taker = params.taker;
+  entity.makerRelayerFeeRecipient = params.makerRelayerFeeRecipient;
+  entity.side = BigInt.fromI32(params.side);
+  entity.saleKind = BigInt.fromI32(params.saleKind);
+  entity.nftAddress = params.nftAddress;
+  entity.tokenId = params.tokenId.toHex();
+  entity.ipfsHash = params.ipfsHash.toHex();
 
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
-  }
-
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
-
-  // Entity fields can be set based on event parameters
-  entity.hash = event.params.hash
-  entity.exchange = event.params.exchange
-
-  // Entities can be written to the store with `.save()`
-  entity.save()
+  entity.save();
 
   // Note: If a handler doesn't require existing field values, it is faster
   // _not_ to load the entity from the store. Instead, create it fresh with
@@ -82,14 +71,40 @@ export function handleOrderApprovedPartOne(event: OrderApprovedPartOne): void {
   // - contract.calculateMatchPrice_(...)
 }
 
-export function handleOrderApprovedPartTwo(event: OrderApprovedPartTwo): void {}
+export function handleOrderApprovedPartTwo(event: OrderApprovedPartTwo): void {
+  const params = event.params;
+  const entity = NiftyConnectOrder.load(params.hash.toHex());
+  if (entity) {
+    entity.calldata = params.calldata;
+    entity.replacementPattern = params.replacementPattern;
+    entity.staticTarget = params.staticTarget.toHex();
+    entity.staticExtradata = params.staticExtradata.toHex();
+    entity.paymentToken = params.paymentToken;
+    entity.orderPrice = new BigDecimal(params.basePrice);
+    entity.extra = params.extra.toHex();
+    entity.listingTime = params.listingTime;
+    entity.expirationTime = params.expirationTime;
+    entity.salt = params.salt.toHex();
+    entity.save();
+  }
+}
 
-export function handleOrderCancelled(event: OrderCancelled): void {}
+export function handleOrderCancelled(event: OrderCancelled): void {
+  const params = event.params;
+  const entity = NiftyConnectOrder.load(params.hash.toHex());
+  if (entity) {
+    entity.isCancelled = true;
+    entity.save();
+  }
+}
 
-export function handleOrdersMatched(event: OrdersMatched): void {}
-
-export function handleNonceIncremented(event: NonceIncremented): void {}
-
-export function handleOwnershipRenounced(event: OwnershipRenounced): void {}
-
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+export function handleOrdersMatched(event: OrdersMatched): void {
+  const params = event.params;
+  const entity = NiftyConnectOrder.load(params.buyHash.toHex());
+  if (entity) {
+    entity.isFinalized = true;
+    entity.maker = params.maker;
+    entity.taker = params.taker;
+    entity.save();
+  }
+}

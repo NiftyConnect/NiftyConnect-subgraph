@@ -1,4 +1,8 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
+description: NiftyConnect is a decentralized asset exchange protocol for ERC721 and ERC1155 running on EVM
+features:
+  - nonFatalErrors
+repository: https://github.com/NiftyConnect
 schema:
   file: ./schema.graphql
 dataSources:
@@ -8,6 +12,7 @@ dataSources:
     source:
       address: "0xB3f5b22Abfe3d441034976512ce9715D553AD60b"
       abi: NiftyConnectExchange
+      startBlock: 17256296
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -32,10 +37,4 @@ dataSources:
           handler: handleOrderCancelled
         - event: OrdersMatched(bytes32,bytes32,indexed address,indexed address,uint256,indexed bytes32)
           handler: handleOrdersMatched
-        - event: NonceIncremented(indexed address,uint256)
-          handler: handleNonceIncremented
-        - event: OwnershipRenounced(indexed address)
-          handler: handleOwnershipRenounced
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
       file: ./src/mapping.ts
