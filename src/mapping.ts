@@ -13,6 +13,7 @@ export function handleOrderApprovedPartOne(event: OrderApprovedPartOne): void {
   const entity = new NiftyConnectOrder(params.hash.toHex());
   entity.txHash = event.transaction.hash.toHex();
   entity.orderHash = params.hash.toHex();
+  entity.exchange = params.exchange;
   entity.maker = params.maker;
   entity.taker = params.taker;
   entity.makerRelayerFeeRecipient = params.makerRelayerFeeRecipient;
