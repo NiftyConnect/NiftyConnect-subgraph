@@ -10,9 +10,9 @@ dataSources:
     name: NiftyConnectExchange
     network: bsc
     source:
-      address: "0xB3f5b22Abfe3d441034976512ce9715D553AD60b"
+      address: "0x939639aff3E4002F91412234B81a7aA25B827e24"
       abi: NiftyConnectExchange
-      startBlock: 17256296
+      startBlock: 17470646
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
