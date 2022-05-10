@@ -56,10 +56,18 @@ export function handleOrderCancelled(event: OrderCancelled): void {
 export function handleOrdersMatched(event: OrdersMatched): void {
   const params = event.params;
   const entity = NiftyConnectOrder.load(params.buyHash.toHex());
+  const entity2 = NiftyConnectOrder.load(params.sellHash.toHex());
   if (entity) {
     entity.isFinalized = true;
     entity.maker = params.maker;
     entity.taker = params.taker;
     entity.save();
+  }
+
+  if (entity2) {
+    entity2.isFinalized = true;
+    entity2.maker = params.maker;
+    entity2.taker = params.taker;
+    entity2.save();
   }
 }
