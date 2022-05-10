@@ -120,10 +120,6 @@ export class OrderApprovedPartTwo__Params {
   get salt(): BigInt {
     return this._event.parameters[10].value.toBigInt();
   }
-
-  get orderbookInclusionDesired(): boolean {
-    return this._event.parameters[11].value.toBoolean();
-  }
 }
 
 export class OrderCancelled extends ethereum.Event {

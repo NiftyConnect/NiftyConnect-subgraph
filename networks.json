@@ -1,7 +1,12 @@
 {
   "bsc": {
     "NiftyConnectExchange": {
-      "address": "0xB3f5b22Abfe3d441034976512ce9715D553AD60b"
+      "address": "0x3b79b127e1194BB4e788e739fE915e61c05564E4"
+    }
+  },
+  "mainnet": {
+    "NiftyConnectExchange": {
+      "address": "0x95030f92569282a9b9e8c8de8e532ca2926ed715"
     }
   }
 }
