@@ -123,6 +123,23 @@ export class NiftyConnectOrder extends Entity {
     }
   }
 
+  get takerRelayerFeeRecipient(): Bytes | null {
+    let value = this.get("takerRelayerFeeRecipient");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set takerRelayerFeeRecipient(value: Bytes | null) {
+    if (!value) {
+      this.unset("takerRelayerFeeRecipient");
+    } else {
+      this.set("takerRelayerFeeRecipient", Value.fromBytes(<Bytes>value));
+    }
+  }
+
   get side(): BigInt {
     let value = this.get("side");
     return value!.toBigInt();

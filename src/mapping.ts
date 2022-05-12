@@ -61,6 +61,7 @@ export function handleOrdersMatched(event: OrdersMatched): void {
     entity.isFinalized = true;
     entity.maker = params.maker;
     entity.taker = params.taker;
+    entity.takerRelayerFeeRecipient = params.takerRelayerFeeRecipient;
     entity.save();
   }
 
@@ -68,6 +69,7 @@ export function handleOrdersMatched(event: OrdersMatched): void {
     entity2.isFinalized = true;
     entity2.maker = params.maker;
     entity2.taker = params.taker;
+    entity2.takerRelayerFeeRecipient = params.takerRelayerFeeRecipient;
     entity2.save();
   }
 }

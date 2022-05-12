@@ -169,12 +169,20 @@ export class OrdersMatched__Params {
     return this._event.parameters[3].value.toAddress();
   }
 
+  get makerRelayerFeeRecipient(): Address {
+    return this._event.parameters[4].value.toAddress();
+  }
+
+  get takerRelayerFeeRecipient(): Address {
+    return this._event.parameters[5].value.toAddress();
+  }
+
   get price(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
+    return this._event.parameters[6].value.toBigInt();
   }
 
   get metadata(): Bytes {
-    return this._event.parameters[5].value.toBytes();
+    return this._event.parameters[7].value.toBytes();
   }
 }
 
@@ -197,6 +205,46 @@ export class NonceIncremented__Params {
 
   get newNonce(): BigInt {
     return this._event.parameters[1].value.toBigInt();
+  }
+}
+
+export class GovernanceTransferred extends ethereum.Event {
+  get params(): GovernanceTransferred__Params {
+    return new GovernanceTransferred__Params(this);
+  }
+}
+
+export class GovernanceTransferred__Params {
+  _event: GovernanceTransferred;
+
+  constructor(event: GovernanceTransferred) {
+    this._event = event;
+  }
+
+  get previousGovernor(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get newGovernor(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class NewPendingGovernor extends ethereum.Event {
+  get params(): NewPendingGovernor__Params {
+    return new NewPendingGovernor__Params(this);
+  }
+}
+
+export class NewPendingGovernor__Params {
+  _event: NewPendingGovernor;
+
+  constructor(event: NewPendingGovernor) {
+    this._event = event;
+  }
+
+  get newPendingGovernor(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 }
 
@@ -240,23 +288,6 @@ export class OwnershipTransferred__Params {
   }
 }
 
-export class NiftyConnectExchange__splitToMerkleRootAndProofResult {
-  value0: Bytes;
-  value1: Array<Bytes>;
-
-  constructor(value0: Bytes, value1: Array<Bytes>) {
-    this.value0 = value0;
-    this.value1 = value1;
-  }
-
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromFixedBytes(this.value0));
-    map.set("value1", ethereum.Value.fromFixedBytesArray(this.value1));
-    return map;
-  }
-}
-
 export class NiftyConnectExchange extends ethereum.SmartContract {
   static bind(address: Address): NiftyConnectExchange {
     return new NiftyConnectExchange("NiftyConnectExchange", address);
@@ -275,6 +306,21 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  governor(): Address {
+    let result = super.call("governor", "governor():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_governor(): ethereum.CallResult<Address> {
+    let result = super.tryCall("governor", "governor():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   tokenTransferProxy(): Address {
@@ -465,21 +511,6 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  registry(): Address {
-    let result = super.call("registry", "registry():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_registry(): ethereum.CallResult<Address> {
-    let result = super.tryCall("registry", "registry():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
   nonces(param0: Address): BigInt {
     let result = super.call("nonces", "nonces(address):(uint256)", [
       ethereum.Value.fromAddress(param0)
@@ -560,29 +591,6 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  _deriveDomainSeparator(): Bytes {
-    let result = super.call(
-      "_deriveDomainSeparator",
-      "_deriveDomainSeparator():(bytes32)",
-      []
-    );
-
-    return result[0].toBytes();
-  }
-
-  try__deriveDomainSeparator(): ethereum.CallResult<Bytes> {
-    let result = super.tryCall(
-      "_deriveDomainSeparator",
-      "_deriveDomainSeparator():(bytes32)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBytes());
-  }
-
   INVERSE_BASIS_POINT(): BigInt {
     let result = super.call(
       "INVERSE_BASIS_POINT",
@@ -597,6 +605,52 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
     let result = super.tryCall(
       "INVERSE_BASIS_POINT",
       "INVERSE_BASIS_POINT():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  pendingGovernor(): Address {
+    let result = super.call(
+      "pendingGovernor",
+      "pendingGovernor():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_pendingGovernor(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "pendingGovernor",
+      "pendingGovernor():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  MAXIMUM_EXCHANGE_RATE(): BigInt {
+    let result = super.call(
+      "MAXIMUM_EXCHANGE_RATE",
+      "MAXIMUM_EXCHANGE_RATE():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_MAXIMUM_EXCHANGE_RATE(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "MAXIMUM_EXCHANGE_RATE",
+      "MAXIMUM_EXCHANGE_RATE():(uint256)",
       []
     );
     if (result.reverted) {
@@ -673,43 +727,6 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  splitToMerkleRootAndProof(
-    merkleData: Array<Bytes>
-  ): NiftyConnectExchange__splitToMerkleRootAndProofResult {
-    let result = super.call(
-      "splitToMerkleRootAndProof",
-      "splitToMerkleRootAndProof(bytes32[]):(bytes32,bytes32[])",
-      [ethereum.Value.fromFixedBytesArray(merkleData)]
-    );
-
-    return new NiftyConnectExchange__splitToMerkleRootAndProofResult(
-      result[0].toBytes(),
-      result[1].toBytesArray()
-    );
-  }
-
-  try_splitToMerkleRootAndProof(
-    merkleData: Array<Bytes>
-  ): ethereum.CallResult<
-    NiftyConnectExchange__splitToMerkleRootAndProofResult
-  > {
-    let result = super.tryCall(
-      "splitToMerkleRootAndProof",
-      "splitToMerkleRootAndProof(bytes32[]):(bytes32,bytes32[])",
-      [ethereum.Value.fromFixedBytesArray(merkleData)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new NiftyConnectExchange__splitToMerkleRootAndProofResult(
-        value[0].toBytes(),
-        value[1].toBytesArray()
-      )
-    );
   }
 
   buildCallData(
@@ -868,7 +885,7 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
   ): Bytes {
     let result = super.call(
       "hashToSign_",
-      "hashToSign_(address[10],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bytes32)",
+      "hashToSign_(address[9],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bytes32)",
       [
         ethereum.Value.fromAddressArray(addrs),
         ethereum.Value.fromUnsignedBigIntArray(uints),
@@ -894,7 +911,7 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
   ): ethereum.CallResult<Bytes> {
     let result = super.tryCall(
       "hashToSign_",
-      "hashToSign_(address[10],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bytes32)",
+      "hashToSign_(address[9],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bytes32)",
       [
         ethereum.Value.fromAddressArray(addrs),
         ethereum.Value.fromUnsignedBigIntArray(uints),
@@ -923,7 +940,7 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
   ): boolean {
     let result = super.call(
       "validateOrderParameters_",
-      "validateOrderParameters_(address[10],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bool)",
+      "validateOrderParameters_(address[9],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bool)",
       [
         ethereum.Value.fromAddressArray(addrs),
         ethereum.Value.fromUnsignedBigIntArray(uints),
@@ -949,7 +966,7 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
   ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
       "validateOrderParameters_",
-      "validateOrderParameters_(address[10],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bool)",
+      "validateOrderParameters_(address[9],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bool)",
       [
         ethereum.Value.fromAddressArray(addrs),
         ethereum.Value.fromUnsignedBigIntArray(uints),
@@ -978,7 +995,7 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
   ): boolean {
     let result = super.call(
       "validateOrder_",
-      "validateOrder_(address[10],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bool)",
+      "validateOrder_(address[9],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bool)",
       [
         ethereum.Value.fromAddressArray(addrs),
         ethereum.Value.fromUnsignedBigIntArray(uints),
@@ -1004,7 +1021,7 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
   ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
       "validateOrder_",
-      "validateOrder_(address[10],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bool)",
+      "validateOrder_(address[9],uint256[9],uint8,uint8,bytes,bytes,bytes32):(bool)",
       [
         ethereum.Value.fromAddressArray(addrs),
         ethereum.Value.fromUnsignedBigIntArray(uints),
@@ -1033,7 +1050,7 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
   ): BigInt {
     let result = super.call(
       "calculateCurrentPrice_",
-      "calculateCurrentPrice_(address[10],uint256[9],uint8,uint8,bytes,bytes,bytes32):(uint256)",
+      "calculateCurrentPrice_(address[9],uint256[9],uint8,uint8,bytes,bytes,bytes32):(uint256)",
       [
         ethereum.Value.fromAddressArray(addrs),
         ethereum.Value.fromUnsignedBigIntArray(uints),
@@ -1059,7 +1076,7 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "calculateCurrentPrice_",
-      "calculateCurrentPrice_(address[10],uint256[9],uint8,uint8,bytes,bytes,bytes32):(uint256)",
+      "calculateCurrentPrice_(address[9],uint256[9],uint8,uint8,bytes,bytes,bytes32):(uint256)",
       [
         ethereum.Value.fromAddressArray(addrs),
         ethereum.Value.fromUnsignedBigIntArray(uints),
@@ -1247,6 +1264,32 @@ export class NiftyConnectExchange extends ethereum.SmartContract {
   }
 }
 
+export class AcceptGovernanceCall extends ethereum.Call {
+  get inputs(): AcceptGovernanceCall__Inputs {
+    return new AcceptGovernanceCall__Inputs(this);
+  }
+
+  get outputs(): AcceptGovernanceCall__Outputs {
+    return new AcceptGovernanceCall__Outputs(this);
+  }
+}
+
+export class AcceptGovernanceCall__Inputs {
+  _call: AcceptGovernanceCall;
+
+  constructor(call: AcceptGovernanceCall) {
+    this._call = call;
+  }
+}
+
+export class AcceptGovernanceCall__Outputs {
+  _call: AcceptGovernanceCall;
+
+  constructor(call: AcceptGovernanceCall) {
+    this._call = call;
+  }
+}
+
 export class ChangeTakerRelayerFeeShareCall extends ethereum.Call {
   get inputs(): ChangeTakerRelayerFeeShareCall__Inputs {
     return new ChangeTakerRelayerFeeShareCall__Inputs(this);
@@ -1397,6 +1440,36 @@ export class ChangeExchangeFeeRateCall__Outputs {
   }
 }
 
+export class SetPendingGovernorCall extends ethereum.Call {
+  get inputs(): SetPendingGovernorCall__Inputs {
+    return new SetPendingGovernorCall__Inputs(this);
+  }
+
+  get outputs(): SetPendingGovernorCall__Outputs {
+    return new SetPendingGovernorCall__Outputs(this);
+  }
+}
+
+export class SetPendingGovernorCall__Inputs {
+  _call: SetPendingGovernorCall;
+
+  constructor(call: SetPendingGovernorCall) {
+    this._call = call;
+  }
+
+  get pendingGovernor_(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class SetPendingGovernorCall__Outputs {
+  _call: SetPendingGovernorCall;
+
+  constructor(call: SetPendingGovernorCall) {
+    this._call = call;
+  }
+}
+
 export class TransferOwnershipCall extends ethereum.Call {
   get inputs(): TransferOwnershipCall__Inputs {
     return new TransferOwnershipCall__Inputs(this);
@@ -1444,12 +1517,20 @@ export class ConstructorCall__Inputs {
     this._call = call;
   }
 
-  get _merkleValidator(): Address {
+  get tokenTransferProxyAddress(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get _royaltyRegisterHub(): Address {
+  get protocolFeeAddress(): Address {
     return this._call.inputValues[1].value.toAddress();
+  }
+
+  get merkleValidatorAddress(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get royaltyRegisterHubAddress(): Address {
+    return this._call.inputValues[3].value.toAddress();
   }
 }
 
@@ -1461,20 +1542,20 @@ export class ConstructorCall__Outputs {
   }
 }
 
-export class ApproveOrder_Call extends ethereum.Call {
-  get inputs(): ApproveOrder_Call__Inputs {
-    return new ApproveOrder_Call__Inputs(this);
+export class MakeOrder_Call extends ethereum.Call {
+  get inputs(): MakeOrder_Call__Inputs {
+    return new MakeOrder_Call__Inputs(this);
   }
 
-  get outputs(): ApproveOrder_Call__Outputs {
-    return new ApproveOrder_Call__Outputs(this);
+  get outputs(): MakeOrder_Call__Outputs {
+    return new MakeOrder_Call__Outputs(this);
   }
 }
 
-export class ApproveOrder_Call__Inputs {
-  _call: ApproveOrder_Call;
+export class MakeOrder_Call__Inputs {
+  _call: MakeOrder_Call;
 
-  constructor(call: ApproveOrder_Call) {
+  constructor(call: MakeOrder_Call) {
     this._call = call;
   }
 
@@ -1502,19 +1583,15 @@ export class ApproveOrder_Call__Inputs {
     return this._call.inputValues[5].value.toBytes();
   }
 
-  get orderbookInclusionDesired(): boolean {
-    return this._call.inputValues[6].value.toBoolean();
-  }
-
   get merkleData(): Array<Bytes> {
-    return this._call.inputValues[7].value.toBytesArray();
+    return this._call.inputValues[6].value.toBytesArray();
   }
 }
 
-export class ApproveOrder_Call__Outputs {
-  _call: ApproveOrder_Call;
+export class MakeOrder_Call__Outputs {
+  _call: MakeOrder_Call;
 
-  constructor(call: ApproveOrder_Call) {
+  constructor(call: MakeOrder_Call) {
     this._call = call;
   }
 }
@@ -1573,20 +1650,20 @@ export class CancelOrder_Call__Outputs {
   }
 }
 
-export class AtomicMatch_Call extends ethereum.Call {
-  get inputs(): AtomicMatch_Call__Inputs {
-    return new AtomicMatch_Call__Inputs(this);
+export class TakeOrder_Call extends ethereum.Call {
+  get inputs(): TakeOrder_Call__Inputs {
+    return new TakeOrder_Call__Inputs(this);
   }
 
-  get outputs(): AtomicMatch_Call__Outputs {
-    return new AtomicMatch_Call__Outputs(this);
+  get outputs(): TakeOrder_Call__Outputs {
+    return new TakeOrder_Call__Outputs(this);
   }
 }
 
-export class AtomicMatch_Call__Inputs {
-  _call: AtomicMatch_Call;
+export class TakeOrder_Call__Inputs {
+  _call: TakeOrder_Call;
 
-  constructor(call: AtomicMatch_Call) {
+  constructor(call: TakeOrder_Call) {
     this._call = call;
   }
 
@@ -1631,10 +1708,10 @@ export class AtomicMatch_Call__Inputs {
   }
 }
 
-export class AtomicMatch_Call__Outputs {
-  _call: AtomicMatch_Call;
+export class TakeOrder_Call__Outputs {
+  _call: TakeOrder_Call;
 
-  constructor(call: AtomicMatch_Call) {
+  constructor(call: TakeOrder_Call) {
     this._call = call;
   }
 }

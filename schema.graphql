@@ -8,6 +8,7 @@ type NiftyConnectOrder @entity {
   maker: Bytes!
   taker: Bytes!
   makerRelayerFeeRecipient: Bytes
+  takerRelayerFeeRecipient: Bytes
   side: BigInt!
   saleKind: BigInt!
   nftAddress: Bytes!
